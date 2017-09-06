@@ -2,6 +2,9 @@
 
 ## socket.on
 
+### message
+
+
 ### part of control
 
 event|value
