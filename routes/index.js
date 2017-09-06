@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var gb = require('./public/javascripts/global.js')
+var gb = require('../public/javascripts/global.js')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -8,10 +8,9 @@ router.get('/', function(req, res, next) {
 });
 
 
-route.post('/login', function(req, res) {
+router.get('/login', function(req, res) {
   var name = req.body.name;
-
-  
+  res.json({'code':name})
 })
 
 //module.exports = function (app) {
