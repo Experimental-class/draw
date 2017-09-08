@@ -3,5 +3,18 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+
+  div
+    input(id='username')
+    button(type="button" onclick='login()' id='loginBtn') login
+  div
+    table(id='status')
+      tr
+        th id
+        th name
+        th ready
+    p(id='online1') CONNECTED: --
+
+
   script(src='/socket.io/socket.io.js')
   script(src='/javascripts/whiteboard.js')

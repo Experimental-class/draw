@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('draw:server');
 var http = require('http');
+var io = require('../socketio');
 
 /**
  * Get port from environment and store in Express.
@@ -20,38 +21,11 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+io.getServer(server)
 
 /**
  * Listen on provided port, on all network interfaces.
  */
-
-
-
-// create socket.io
-var io = require('socket.io')(server);
-
-var userCount = 0;
-
-io.on('connection', function(socket){
-  userCount ++;
-  console.log('User connected: ' + userCount);
-
-  socket.on('disconnect', function(){
-    userCount --;
-    console.log('User connected: ' + userCount);
-  });
-
-  
-  socket.on('message', function( msg ){
-    if (msg.type == 'game control'){
-
-    }
-  })
-
-})
-
-
-
 
 server.listen(port);
 server.on('error', onError);

@@ -8,9 +8,31 @@ router.get('/', function(req, res, next) {
 });
 
 
-router.get('/login', function(req, res) {
-  var name = req.body.name;
-  res.json({'code':name})
+router.post('/login', function(req, res) {
+  // var name = req.body.name;
+  // res.json({'code':name})
+  gb.DEBUG_MODE && console.log(req.body);
+    var name = req.body.name
+    var randomID = gb.randomIDCreator(12)
+    // var gameID = gb.gameID
+    while (gb.sessionRepeat(randomID, gb.members.map(function(i){return i.id}) )) {
+      randomID = gb.randomIDCreator(12)
+    }
+    if (gb.gameState>0) {
+      res.json({'code':'-1'})
+    } else if (gb.sessionRepeat(name, gb.members.map(function (i) {return i.name}))) {
+      res.json({'code':'0'})
+    } else {
+      res.json({'code':'1','id':randomID})
+      gb.members.push({
+        name: name,
+        id: randomID,
+        score: 0,
+        role: 0,
+        ready: false,
+        restOfTurn: 1,
+      })
+    }
 })
 
 //module.exports = function (app) {
