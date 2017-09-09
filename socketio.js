@@ -11,6 +11,7 @@ socketio.getServer = (server) => {
     console.log('User connected: ' + userCount);
     io.emit('user count', userCount);
     socket.emit('members', gb.members)
+    socket.emit('game status', gb.gameState)
 
     socket.on('disconnect', () => {
       userCount --;
@@ -20,19 +21,23 @@ socketio.getServer = (server) => {
       socket.broadcast.emit('members', gb.members)
     });
 
+    setInterval(() => {
+      socket.emit('time', {
+        // gameID: gb.gameID,
+        countDown: gb.countDown.toFixed(2)
+      })
+    }, 500)
+
     // when the client emits 'add user', this listens and executes
     socket.on('add user', username => {
       // we store the username in the socket session for this client
       socket.username = username;
       //  note: socket.id is already generated.
-
       // socket.id = gb.randomIDCreator(12)
       // var gameID = gb.gameID
       // while (gb.sessionRepeat(socket.id, gb.members.map(function(i){return i.id}) )) {
       //   socket.id = gb.randomIDCreator(12)
       // }
-
-
       gb.members.push({
         name: socket.username,
         id: socket.id,
@@ -41,21 +46,8 @@ socketio.getServer = (server) => {
         ready: false,
         restOfTurn: 1,
       })
-
-
       socket.broadcast.emit('members', gb.members)
       socket.emit('members', gb.members)
-
-      // ++numUsers;
-      // addedUser = true;
-      // socket.emit('login', {
-      //   numUsers: numUsers
-      // });
-      // echo globally (all clients) that a person has connected
-      // socket.broadcast.emit('user joined', {
-      //   username: socket.username,
-      //   numUsers: numUsers
-      // });
     });
 
     // setInterval(() => {
@@ -66,13 +58,27 @@ socketio.getServer = (server) => {
         gb.userReady(userid);
         socket.broadcast.emit('members', gb.members);
         socket.emit('members', gb.members);
+
+        let usersCountValid = gb.members.length > 1;
+        let usersAllReady = gb.members.filter((m)=>!m.ready).length === 0;
+        if(usersCountValid && usersAllReady){
+          gb.countDowner(()=>{
+            gb.countDown = gb.countDownInit
+          });
+        }
     })
+
+
 
     socket.on('message', msg => {
       if (msg.type == 'game control'){
-
+        if (msg.status == 1) {
+          gb.countDowner(1)
+        }
       }
     });
+
+
 
   })
 }

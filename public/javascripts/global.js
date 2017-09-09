@@ -1,8 +1,8 @@
 let Global =  {
   DEBUG_MODE : 1,
   members : [],
-  countDownInit: 12,
-  countDown : 12,
+  countDownInit: 4,
+  countDown : 3,
   gameState : 0, //0 for off, 1 for process
   gameID : '',
   turns : 1,
@@ -24,11 +24,12 @@ Global.userReady = (id) => {
   member[0].ready = !member[0].ready
 };
 
-Global.countDowner = function (fun) {
+Global.countDowner = (fun)=> {
   setTimeout(()=>{
     Global.countDown -= 0.1
     if(Global.countDown>0){
-        setTimeout(arguments.callee, 100);
+        setTimeout(()=> Global.countDowner(fun), 100);
+        // console.log(Global.countDown, arguments.callee)
     } else {
       fun && fun()
     }
