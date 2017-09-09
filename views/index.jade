@@ -4,9 +4,12 @@ block content
   h1= title
   p Welcome to #{title}
 
-  div
+  div(id='loginDiv')
     input(id='username')
-    button(type="button" onclick='login()' id='loginBtn') login
+    button(type='button' onclick='login()' id='loginBtn') login
+  div(id='readyDiv', hidden='hidden')
+    pane(id='readyInfo')
+    button(type='button' onclick='ready()' id='readyBtn') ready
   div
     table(id='status')
       tr

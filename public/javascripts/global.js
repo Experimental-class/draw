@@ -1,4 +1,4 @@
-var Global =  {
+let Global =  {
   DEBUG_MODE : 1,
   members : [],
   countDownInit: 12,
@@ -16,28 +16,16 @@ function Member(){
   this.ready = false;
   this.score = 0;
   this.restOfTurn = 1;
+  this.online;
 }
 
-
-Global.randomIDCreator = function (l) {
-  var ar = "0123456789ABCDEF";
-  var result = "";
-  for (var i = 0; i < l; i++) {
-    result += ar[Math.floor(Math.random()*ar.length)];
-  }
-  return result
-}
-
-Global.sessionRepeat = function(session, sessions) {
-  var isRepeated = false
-  sessions.forEach(function (n) {
-    session == n && (isRepeated = true)
-  })
-  return isRepeated
-}
+Global.userReady = (id) => {
+  member = Global.members.filter((m)=>m.id===id)
+  member[0].ready = !member[0].ready
+};
 
 Global.countDowner = function (fun) {
-  setTimeout(function(){
+  setTimeout(()=>{
     Global.countDown -= 0.1
     if(Global.countDown>0){
         setTimeout(arguments.callee, 100);

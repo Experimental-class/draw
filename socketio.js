@@ -21,23 +21,31 @@ socketio.getServer = (server) => {
     });
 
     // when the client emits 'add user', this listens and executes
-    socket.on('add user', function (username) {
+    socket.on('add user', username => {
       // we store the username in the socket session for this client
       socket.username = username;
-      socket.id = gb.randomIDCreator(12)
+      //  note: socket.id is already generated.
+
+      // socket.id = gb.randomIDCreator(12)
       // var gameID = gb.gameID
-      while (gb.sessionRepeat(socket.id, gb.members.map(function(i){return i.id}) )) {
-        socket.id = gb.randomIDCreator(12)
-      }
+      // while (gb.sessionRepeat(socket.id, gb.members.map(function(i){return i.id}) )) {
+      //   socket.id = gb.randomIDCreator(12)
+      // }
+
+
       gb.members.push({
-        name: username,
+        name: socket.username,
         id: socket.id,
         score: 0,
         role: 0,
         ready: false,
         restOfTurn: 1,
       })
+
+
       socket.broadcast.emit('members', gb.members)
+      socket.emit('members', gb.members)
+
       // ++numUsers;
       // addedUser = true;
       // socket.emit('login', {
@@ -54,11 +62,15 @@ socketio.getServer = (server) => {
     //   socket.emit('members', gb.members);
     // }, 3000)
 
+    socket.on('user ready', userid=>{
+        gb.userReady(userid);
+        socket.broadcast.emit('members', gb.members);
+        socket.emit('members', gb.members);
+    })
+
     socket.on('message', msg => {
       if (msg.type == 'game control'){
-        gb.countDowner(() => {
-          socket.emit('members', gb.members)
-        })
+
       }
     });
 
