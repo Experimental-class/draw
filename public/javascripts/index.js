@@ -8,13 +8,14 @@ function $(id) {
 
 
 //  登录
-function login() {
-    var userName = $('user-name').value;
-    var loginContainer = $('login-container');
-
-    socket.emit('add user',userName);  //  用户名
-    loginContainer.style.display = 'none';
-}
+var userName = $('user-name');
+var loginContainer = $('login-container');
+userName.onkeydown = function (e) {
+    if (e.key == 'Enter'){
+        socket.emit('add user',userName.value);  //  用户名
+        loginContainer.style.display = 'none';
+    }
+};
 
 //  准备
 function ready() {
