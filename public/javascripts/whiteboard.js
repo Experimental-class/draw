@@ -37,6 +37,10 @@ socket.on('time', time=>{
   $('countDown').innerHTML = 'COUNTDOWN: ' + time.countDown
 })
 
+socket.on('word', wordObj=>{
+  $('word').innerHTML = 'WORD: ' + wordObj.word + ' TIP: ' + wordObj.tip
+})
+
 socket.on('user count', count=>{
   $('online1').innerHTML = 'CONNECTED: ' + count;
 });
