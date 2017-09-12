@@ -10,8 +10,8 @@ socketio.getServer = (server) => {
     userCount ++;
     console.log('User connected: ' + userCount);
     io.emit('user count', userCount);
-    socket.emit('members', gb.members)
-    socket.emit('game status', gb.gameState)
+    io.emit('members', gb.members)
+    io.emit('game status', gb.gameState)
 
     socket.on('disconnect', () => {
       userCount --;
@@ -44,10 +44,11 @@ socketio.getServer = (server) => {
         score: 0,
         role: 0,
         ready: false,
-        restOfTurn: 1,
+        restOfTurn: 2,
       })
-      socket.broadcast.emit('members', gb.members)
-      socket.emit('members', gb.members)
+      // socket.broadcast.emit('members', gb.members)
+      // socket.emit('members', gb.members)
+      io.emit('members', gb.members)
     });
 
     // setInterval(() => {
@@ -56,14 +57,21 @@ socketio.getServer = (server) => {
 
     socket.on('user ready', userid=>{
         gb.userReady(userid);
-        socket.broadcast.emit('members', gb.members);
-        socket.emit('members', gb.members);
+        // socket.broadcast.emit('members', gb.members);
+        // socket.emit('members', gb.members);
+        io.emit('members', gb.members);
 
         let usersCountValid = gb.members.length > 1;
         let usersAllReady = gb.members.filter((m)=>!m.ready).length === 0;
         if(usersCountValid && usersAllReady){
           gb.countDowner(()=>{
-            gb.countDown = gb.countDownInit
+            gb.countDown = gb.countDownInit;
+            io.emit('game status', 1);
+            io.emit('word', gb.randomWord());
+            console.log(1111)
+            // io.emit('next', gb.nextDrawer);
+            // socket.emit('game status', 1);
+            // socket.broadcast.emit('game status', 1);
           });
         }
     })
@@ -72,9 +80,7 @@ socketio.getServer = (server) => {
 
     socket.on('message', msg => {
       if (msg.type == 'game control'){
-        if (msg.status == 1) {
-          gb.countDowner(1)
-        }
+
       }
     });
 

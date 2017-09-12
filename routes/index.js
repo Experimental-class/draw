@@ -1,13 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var gb = require('../public/javascripts/global.js')
+const path = require('path');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  if (gb.DEBUG_MODE) {
+    res.render('index', { title: 'Express' });
+  } else {
+    res.sendFile(path.join(__dirname, '../public', 'game.html'));
+  }
 });
 
-
+// note: method abanded
 router.post('/login', function(req, res) {
   // var name = req.body.name;
   // res.json({'code':name})
