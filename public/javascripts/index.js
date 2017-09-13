@@ -46,12 +46,17 @@ socket.on('members',function (data) {
     if (data.length >= 2){
         for (var j = 1; j < data.length; j++){
             if (data[0].ready === true && data[j].ready === data[j-1].ready){
-                var countTime = $("time");
-                var s=60;
+                var startContainer = $('start-container');
+                var startTime = $('count-time');
+
+                startContainer.style.display = 'block';
+
+                var s=5;
                 var intetvalFirst = setInterval(function () {
-                    countTime.textContent = s--;
+                    startTime.textContent = s--;
                     if (s <= 0){
                         clearInterval(intetvalFirst);
+                        startContainer.style.display = 'none';
                     }
                 },1000)
             }
@@ -61,7 +66,20 @@ socket.on('members',function (data) {
 
 //  游戏状态
 socket.on('game status',function (data) {
+    var word = $('word');
+
     console.log(data);
+    if (data.status === 1){
+        word.innerHTML = data.word;
+        var countTime = $("time");
+        var s=60;
+        var intetvalFirst = setInterval(function () {
+            countTime.textContent = s--;
+            if (s <= 0){
+                clearInterval(intetvalFirst);
+            }
+        },1000)
+    }
 });
 
 //  游戏计时
@@ -180,19 +198,20 @@ linewidthPicker.onchange = function() {
 
 //  回答兼聊天
 // var user = 'user' + Math.floor(Math.random()*1000);
-// var postChatData = document.getElementById('postChat');
-// var chatData = document.getElementById('chat');
-// var tipsContainer = document.getElementById('tips');
+// var postChatData = $('postChat');
+// var chatData = $('chat');
+// var tipsContainer = $('tips');
 // postChatData.onclick = function () {
-//     socket.emit('chat data',{user:user,msg:chatData.value});
+//     socket.emit('chat',chatData.value);
 //     chatData.value = '';
 // };
 // chatData.onkeydown = function (e) {
 //     if (e.key == 'Enter'){
-//         socket.emit('chat data',{user:user,msg:chatData.value});
+//         socket.emit('chat',chatData.value);
 //         chatData.value = '';
 //     }
 // };
-// socket.on('chat data',function (data) {
-//     tipsContainer.innerHTML += "<li><b style='color: red'>"+data.user + "：</b>" + data.msg+"</li>";
+// socket.on('chat',function (data) {
+//     console.log(data)
+//     // tipsContainer.innerHTML += "<li><b style='color: red'>"+data.user + "：</b>" + data.msg+"</li>";
 // });
