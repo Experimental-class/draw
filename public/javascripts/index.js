@@ -196,4 +196,3 @@ linewidthPicker.onchange = function() {
 // socket.on('chat data',function (data) {
 //     tipsContainer.innerHTML += "<li><b style='color: red'>"+data.user + "：</b>" + data.msg+"</li>";
 // });
-
