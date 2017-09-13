@@ -29,11 +29,27 @@ see ex
 
 Event|Server|Client|statement
 ------------ | ------------- | ------------ | -------------
-'game status'|emit|on|客户端监听游戏状态
+'game status'*|emit|on|客户端监听游戏状态
 'add user'|on|emit|发送自定义username即可
 'user ready'|on|emit|发送socket.id即可
 'members'|emit|on|客户端监控所有用户的信息变化(array)
 'time'|emit|on|客户端监听各种需要的时间计时
 'draw line'|on&emit|emit&on|发送接收画图元信息，服务端进行广播
-'message'|on|emit|发送各种事件（考虑取消）
-''
+'message'|on|emit|发送其他事件
+
+
+注 'game status' msg详解
+```
+{
+  'status' : 0   // 游戏已停止
+}
+```
+
+```
+{
+  'status' : 1,       // 游戏进行中
+  'nextDrawer' : <str>,  // <object member> .id .name
+  'word' : <str>,     // 猜词
+  'tip' : <str>       // 提示
+}
+```

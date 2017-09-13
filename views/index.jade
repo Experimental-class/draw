@@ -5,7 +5,7 @@ block content
   p Welcome to #{title}
 
   div(id='loginDiv')
-    input(id='username')
+    input(id='nameInput')
     button(type='button' onclick='login()' id='loginBtn') login
   div(id='readyDiv', hidden='hidden')
     pane(id='readyInfo')
@@ -18,9 +18,14 @@ block content
         th ready
     p(id='online1') CONNECTED: --
   div
-    p(id='word') WORD: --
+    p(id='word') WORD: -- TIP: --
+    table(id='chatTable')
+    input(id='guessInput' placeholder='input...' disabled='disabled')
+    button(type='button' onclick='guess()' id='guessBtn' disabled='disabled') send
   div
     p(id='countDown') COUNTDOWN: --
+
+
 
 
 
