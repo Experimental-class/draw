@@ -3,13 +3,14 @@
     padding: 0;
 }
 html,body{
-    /*overflow-y: hidden;*/
+    overflow: hidden;
     background: #c3b3a3;
     color: #897561;
 }
 
 
 .login-container {
+    display: none;
     position: absolute;
     background: url("../imgs/login-background.jpg") no-repeat;
     background-size: cover;
@@ -106,7 +107,12 @@ html,body{
     box-shadow: none;
     background: none;
 }
-
+.score #login-button{
+    margin-right: 35px;
+}
+.score #ready-button{
+    display: none;
+}
 
 /* end */
 /* 房间状态 */

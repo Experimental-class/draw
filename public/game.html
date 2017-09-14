@@ -31,9 +31,8 @@
                 <img src="imgs/favicon.jpg">
                 <p>总积分：</p>
             </div>
-            <!--<button>离开</button>-->
-            <!--<button onclick="start()">开始</button>-->
-            <button onclick="ready()">准备好了</button>
+            <button onclick="ready()" id="ready-button">准备好了</button>
+            <button onclick="toLogin()" id="login-button">登录</button>
         </div>
         <!-- end -->
         <!-- 房间状态 -->
@@ -49,7 +48,7 @@
         <!-- 画板 -->
         <div class="board">
             <header class="header">
-                <div>当前词汇：<a id="word"></a></div>
+                <div><b id="nowWord"></b><a id="word"></a></div>
                 <div id="time"></div>
             </header>
             <div id="canvas-container">
