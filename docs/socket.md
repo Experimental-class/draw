@@ -34,8 +34,11 @@ Event|Server|Client|statement
 'user ready'|on|emit|发送socket.id即可
 'members'|emit|on|客户端监控所有用户的信息变化(array)
 'time'|emit|on|客户端监听各种需要的时间计时
-'draw line'|on&emit|emit&on|发送接收画图元信息，服务端进行广播
-'message'|on|emit|发送其他事件
+'chat'|broadcast|emit&on|发送接收聊天信息，服务端仅广播
+'guess word'|on|emit|用户猜词尝试
+'draw line'|broadcast|emit&on|发送接收画图元信息，服务端仅广播
+'clean line'*|broadcast|emit&on|发送清除画布内容信息，服务端仅广播
+
 
 
 注 'game status' msg详解
@@ -53,3 +56,8 @@ Event|Server|Client|statement
   'tip' : <str>       // 提示
 }
 ```
+
+
+注'clean line' 用法
+
+可以为`drawer`添加一个清屏按钮（或其他方法

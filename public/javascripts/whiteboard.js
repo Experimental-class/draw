@@ -92,6 +92,7 @@ socket.on('game status', sta => {
   // for chatting forbidden
   $('guessInput').disabled = '';
   $('guessBtn').disabled = '';
+  $('guessBtn').textContent = 'send';
 
   if (isTourist) {
     $('word').innerHTML = 'WORD: ' + sta.word + ' TIP: ' + sta.tip;
@@ -106,6 +107,7 @@ socket.on('game status', sta => {
       // drawer forbidden
       $('guessInput').disabled = 'disabled';
       $('guessBtn').disabled = 'disabled';
+      $('guessBtn').textContent = 'drawing...';
     } else { // guessing people
       $('word').innerHTML = sta.nextDrawer.name + ' is drawing... TIP: ' + sta.tip;
     }

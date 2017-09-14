@@ -22,33 +22,31 @@ socketio.getServer = (server) => {
       let usersCountInvalid = gb.members.length < 2;
       if ( usersCountInvalid ) {
         clearInterval(gb.gameID);
-        io.emit('game status', {
-          status: gb.gameState = 0
-        });
+        io.emit('game status', {status: gb.gameState = 0});
       };
     });
 
-    // let TimeCounter = (fun, time) => {
-    //     setTimeout(()=>{
-    //       fun && fun();
-    //       setTimeout(()=> TimeCounter(fun, time));
-    //     }, time);
-    // }
+    socket.on('chat', chat => {
+      socket.broadcast.emit('chat', chat);
+    })
 
-    gb.setTimeoutLink(()=>{
-    // TimeCounter(()=>{
-      socket.emit('time', {
-        // gameID: gb.gameID,
-        countDown: gb.countDown.toFixed()
-      })
-    }, 500)
+    socket.on('draw line', line=>{
+      socket.broadcast.emit('draw line', line);
+    });
 
-    // setInterval(() => {
-    //   socket.emit('time', {
-    //     // gameID: gb.gameID,
-    //     countDown: gb.countDown.toFixed(2)
-    //   })
-    // })
+    socket.on('clean line', msg=>{
+      socket.broadcast.emit('clean line', msg);
+    });
+
+
+
+    socket.on('guess word', word => {
+      gb.DEBUG_MODE && console.log('\nUser', socket.username , 'guess word: ', word, gb.word.word, 'result:' , word == gb.word.word)
+      if (word == gb.word.word) {
+        user = gb.members.filter((i)=>{return i.id == socket.id})[0];
+        user.bingo = true;
+      }
+    })
 
     // when the client emits 'add user', this listens and executes
     socket.on('add user', username => {
@@ -128,7 +126,7 @@ socketio.getServer = (server) => {
             /********** countDowner( draw&guess time ) **********/
             gb.countDown = gb.countDownDrawing;
             gb.countDowner(()=>{
-              gb.DEBUG_MODE && console.log('\n<Turn', turnCount, 'ends> Time up, guessing Result: \n');
+              gb.DEBUG_MODE && console.log('\n<Turn', turnCount, 'ends> Time up, guessing Result:\n (Empty for nobody gaining score.)\n');
               gb.countScore(); // checked results when guessing ends
               io.emit('members', gb.members)
               ++turnCount;
@@ -157,6 +155,7 @@ socketio.getServer = (server) => {
                 'restOfTurn: ', m.restOfTurn
               )
             }
+            console.log()
 
 
 
@@ -169,17 +168,13 @@ socketio.getServer = (server) => {
 
 
 
-    socket.on('chat', chat => {
-      socket.broadcast.emit('chat', chat);
-    })
-
-    socket.on('guess word', word => {
-      gb.DEBUG_MODE && console.log('\nUser', socket.username , 'guess word: ', word, gb.word.word, 'result:' , word == gb.word.word)
-      if (word == gb.word.word) {
-        user = gb.members.filter((i)=>{return i.id == socket.id})[0];
-        user.bingo = true;
-      }
-    })
+    gb.setTimeoutLink(()=>{
+    // TimeCounter(()=>{
+      socket.emit('time', {
+        // gameID: gb.gameID,
+        countDown: gb.countDown.toFixed()
+      })
+    }, 500);
 
 
   })
