@@ -3,12 +3,12 @@ let Global =  {
     members : [],
     word : {},                 // current guessing wordObj
     countDownInit: 3,          // for ready
-    countDownDrawing: 15,      // for drawing
-    countDownTurn: 20,         // one turn time
+    countDownDrawing: 30,      // for drawing
+    countDownTurn: 45,         // one turn time
     countDown : 3,
     gameState : 0,             // 0 for off, 1 for process
     gameID : '',
-    turnsInit : 3,             // game turns
+    turnsInit : 2,             // game turns
 }
 
 
@@ -31,7 +31,7 @@ Global.userReady = id => {
 
 
 Global.countScore = () => {
-  Global.DEBUG_MODE && console.log('\nTime up, Guessing Result: ')
+  // Global.DEBUG_MODE && console.log('\n <Turn ends> Time up, Guessing Result: ')
   Global.members.forEach(m=>{
     if (m.bingo) {
       m.bingo = false;
@@ -41,22 +41,36 @@ Global.countScore = () => {
   })
 }
 
+/* count down to fun() once */
 Global.countDowner = fun => {
-    setTimeout(()=>{
-        Global.countDown -= 0.1
-        if(Global.countDown>0){
-            setTimeout(()=> Global.countDowner(fun), 100);
-            // console.log(Global.countDown, arguments.callee)
-        } else {
-            fun && fun();
-        }
-    },100);
+  const Interval = 0.1;
+  setTimeout(()=>{
+    Global.countDown -= Interval;
+    if(Global.countDown>0){
+      setTimeout(()=> Global.countDowner(fun), Interval*1000);
+      // console.log(Global.countDown, arguments.callee)
+    } else {
+      fun && fun();
+    }
+  }, Interval*1000);
 }
 
 
 Global.setInterval = (fun, time) => {
   fun();
   return setInterval(fun, time);
+}
+
+Global.setTimeoutLink = (fun, time, cb) => { // cb() return true, link ends
+  setTimeout(()=>{
+    fun && fun();
+    cb && cb() || setTimeout(()=> Global.setTimeoutLink(fun, time, cb));
+  }, time);
+}
+
+Global.setTimeoutLinkIme = (fun, time, cb) => {
+  fun && fun();
+  Global.setTimeoutLink(fun, time, cb);
 }
 
 
