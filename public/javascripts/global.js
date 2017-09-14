@@ -3,22 +3,23 @@ let Global =  {
     members : [],
     word : {},                 // current guessing wordObj
     countDownInit: 3,          // for ready
-    countDownDrawing: 25,      // for drawing
-    countDownTurn: 25,         // one turn time
+    countDownDrawing: 15,      // for drawing
+    countDownTurn: 20,         // one turn time
     countDown : 3,
     gameState : 0,             // 0 for off, 1 for process
     gameID : '',
-    turns : 1,
+    turnsInit : 3,             // game turns
 }
 
 
-function Member(){
+function Member(){             // model, no actul use
     this.id;
     this.name;
     // this.role = 0;          // 1 for draw, 0 for guess
-    this.ready = false;     // be ready to start
+    this.ready = false;        // be ready to start
     this.score = 0;
-    this.restOfTurn = 2;    // not 0, gameState not changed
+    this.restOfTurn = 2;       // not 0, gameState not changed
+    this.bingo = false;        // guess right!
     // this.online;            // leave for next version
 }
 
@@ -29,6 +30,16 @@ Global.userReady = id => {
 };
 
 
+Global.countScore = () => {
+  Global.DEBUG_MODE && console.log('\nTime up, Guessing Result: ')
+  Global.members.forEach(m=>{
+    if (m.bingo) {
+      m.bingo = false;
+      m.score ++;
+      Global.DEBUG_MODE && console.log('\nUser ' + m.name + ' guess right, score:' + m.score)
+    }
+  })
+}
 
 Global.countDowner = fun => {
     setTimeout(()=>{
@@ -40,6 +51,12 @@ Global.countDowner = fun => {
             fun && fun();
         }
     },100);
+}
+
+
+Global.setInterval = (fun, time) => {
+  fun();
+  return setInterval(fun, time);
 }
 
 

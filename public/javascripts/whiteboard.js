@@ -2,6 +2,7 @@ const socket = io();
 
 const $=(id)=> document.getElementById(id);
 
+let gameState = 0;
 
 // --- button function ---
 
@@ -14,6 +15,7 @@ const login = ()=>{
   $('loginDiv').hidden = true;
   $('readyDiv').hidden = false;
 
+  // chatting: login required
   $('guessInput').disabled = '';
   $('guessBtn').disabled = '';
 
@@ -29,8 +31,11 @@ const ready = ()=> {
   $('readyBtn').textContent = '√';
 }
 
+let cooldown = 0;
+
 const guess = () => {
-  if($('guessInput').value == '') return
+  if (cooldown > 0) return
+  if ($('guessInput').value == '') return
   let newTR = $('chatTable').insertRow();
   let text = document.createElement('font');
   text.color = 'red';
@@ -38,16 +43,33 @@ const guess = () => {
   newTR.insertCell(0).appendChild(text);
   newTR.insertCell(1).innerHTML = $('guessInput').value
 
+  // chatting
   socket.emit('chat', {
     username: socket.username || 'unknown user',
     word: $('guessInput').value,
   });
 
+  // guessing  (note: drawer chatting forbidden)
+  gameState && socket.emit('guess word', $('guessInput').value);
+
   $('guessInput').value = '';
+
+  // chatting cooldown
+  cooldown = 2;
+  $('guessBtn').disabled = 'disabled';
+  $('guessBtn').textContent = cooldown;
+  let cooldowner = setInterval(()=>{
+    $('guessBtn').textContent = --cooldown;
+    if (cooldown <= 0){
+      clearInterval(cooldowner);
+      $('guessBtn').disabled = '';
+      $('guessBtn').textContent = 'send';
+    }
+  }, 1e3); // 1s for interval
+
+
 }
-// ---- key event and locking ---
-
-
+// ---- key event ---
 
 $('nameInput').onkeydown = e => {
   e.key == 'Enter' && login();
@@ -62,22 +84,35 @@ $('guessInput').onkeydown = e => {
 // ---- socket.io ---
 
 socket.on('game status', sta => {
-  console.log(Members)
-  let gameInProgress = sta.status === 1;
-  if (gameInProgress) {
-    let isTourist = false; // todo:
-    let isDrawer = sta.nextDrawer.id === socket.id;
-    if (isTourist) {
-      $('word').innerHTML = 'WORD: ' + sta.word + ' TIP: ' + sta.tip;
-    } else if (isDrawer) {
-      $('word').innerHTML = 'WORD: ' + sta.word + ' TIP: ' + sta.tip + ' (Drawing)';
-    } else {
-      $('word').innerHTML = sta.nextDrawer.name + ' is drawing... TIP: ' + sta.tip;
-      $('guessBtn').disabled = '';
-      $('guessInput').disabled = '';
-    }
-  } else {
+  gameState = sta.status;
 
+  let isTourist = !socket.username;
+  let gameInProgress = sta.status === 1;
+
+  // for chatting forbidden
+  $('guessInput').disabled = '';
+  $('guessBtn').disabled = '';
+
+  if (isTourist) {
+    $('word').innerHTML = 'WORD: ' + sta.word + ' TIP: ' + sta.tip;
+    // tourist forbidden
+    $('guessInput').disabled = 'disabled';
+    $('guessBtn').disabled = 'disabled';
+
+  } else if (gameInProgress) {
+    let isDrawer = sta.nextDrawer.id === socket.id;
+    if (isDrawer) {
+      $('word').innerHTML = 'WORD: ' + sta.word + ' TIP: ' + sta.tip + ' (Drawing)';
+      // drawer forbidden
+      $('guessInput').disabled = 'disabled';
+      $('guessBtn').disabled = 'disabled';
+    } else { // guessing people
+      $('word').innerHTML = sta.nextDrawer.name + ' is drawing... TIP: ' + sta.tip;
+    }
+  } else { // game status = 0
+    $('word').innerHTML = 'game over, ready to start';
+    $('readyBtn').disabled = '';
+    $('readyBtn').textContent = 'ready';
   }
 })
 
@@ -86,33 +121,29 @@ socket.on('chat', chat=>{
   let newTR = $('chatTable').insertRow();
   newTR.insertCell(0).innerHTML = chat.username;
   newTR.insertCell(1).innerHTML = chat.word;
+
+
 })
 
 socket.on('time', time=>{
-  $('countDown').innerHTML = 'COUNTDOWN: ' + time.countDown
+  $('countDown').innerHTML = 'COUNTDOWN: ' + (time.countDown > 0 ? time.countDown : '0.00');
 })
 
-<<<<<<< HEAD
-socket.on('word', wordObj=>{
-  $('word').innerHTML = 'WORD: ' + wordObj.word + ' TIP: ' + wordObj.tip
-})
-=======
+
 // socket.on('word', wordObj=>{
 //   $('word').innerHTML = 'WORD: ' + wordObj.word + ' TIP: ' + wordObj.tip
 // })
->>>>>>> bdda80ab42c8fa1d60432667b666325e88bf6474
+
 
 socket.on('user count', count=>{
   $('online1').innerHTML = 'CONNECTED: ' + count;
 });
 
-var Members = []
+
 
 socket.on('members', members=>{
-  Members = members
   // reset old table
-  for(let i = $('status').rows.length - 1 ; i > 0 ; i--)
-    $('status').deleteRow(i);
+  for(let i = $('status').rows.length - 1 ; i > 0 ; i--) $('status').deleteRow(i);
   for(m in members){
       // no need for myself
       if(members[m].id === socket.id) continue;
@@ -125,6 +156,7 @@ socket.on('members', members=>{
       input.checked = members[m].ready;
       input.disabled = 'disabled';
       newTR.insertCell(2).appendChild(input);
+      newTR.insertCell(3).innerHTML = members[m].score
   }
 
   if ($('status').rows.length < 2) {
@@ -132,6 +164,7 @@ socket.on('members', members=>{
     emptyTR.insertCell(0).innerHTML ='------------'
     emptyTR.insertCell(1).innerHTML ='-'
     emptyTR.insertCell(2).innerHTML ='-'
+    emptyTR.insertCell(3).innerHTML ='-'
   }
 
 });
