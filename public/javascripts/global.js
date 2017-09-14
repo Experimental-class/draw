@@ -3,9 +3,10 @@ let Global =  {
     members : [],
     word : {},                 // current guessing wordObj
     countDownInit: 3,          // for ready
-    countDownDrawing: 30,      // for drawing
-    countDownTurn: 45,         // one turn time
+    countDownDrawing: 60,      // for drawing
+    countDownTurn: 70,         // one turn time
     countDown : 3,
+    countDown2 : 3,            // countDown the 2nd
     gameState : 0,             // 0 for off, 1 for process
     gameID : '',
     turnsInit : 2,             // game turns
@@ -43,18 +44,34 @@ Global.countScore = () => {
 
 /* count down to fun() once */
 Global.countDowner = fun => {
-  const Interval = 0.1;
+  const Interval = 0.5;
   setTimeout(()=>{
-    Global.countDown -= Interval;
+    Global.countDown -= Interval*2;
     if(Global.countDown>0){
+      Global.DEBUG_MODE && console.log('countDown: ', Global.countDown.toFixed())
       setTimeout(()=> Global.countDowner(fun), Interval*1000);
       // console.log(Global.countDown, arguments.callee)
     } else {
+      Global.DEBUG_MODE && console.log('countDown: ', Global.countDown.toFixed(), 'fun go')
       fun && fun();
     }
   }, Interval*1000);
 }
 
+Global.countDowner2 = fun => {
+  const Interval = 0.1;
+  setTimeout(()=>{
+    Global.countDown2 -= Interval;
+    if(Global.countDown2>0){
+      Global.DEBUG_MODE && console.log('countDown: ', Global.countDown2.toFixed(2))
+      setTimeout(()=> Global.countDowner(fun), Interval*1000);
+      // console.log(Global.countDown, arguments.callee)
+    } else {
+      Global.DEBUG_MODE && console.log('countDown: ', Global.countDown2.toFixed(2), 'fun go')
+      fun && fun();
+    }
+  }, Interval*1000);
+}
 
 Global.setInterval = (fun, time) => {
   fun();

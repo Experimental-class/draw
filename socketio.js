@@ -39,7 +39,7 @@ socketio.getServer = (server) => {
     // TimeCounter(()=>{
       socket.emit('time', {
         // gameID: gb.gameID,
-        countDown: gb.countDown.toFixed(2)
+        countDown: gb.countDown.toFixed()
       })
     }, 500)
 
@@ -70,7 +70,7 @@ socketio.getServer = (server) => {
 
     /***************** game flow ***************/
     socket.on('user ready', userid=>{
-      gb.DEBUG_MODE && console.log('\nUser ' + socket.username + ' is ready\n');
+      gb.DEBUG_MODE && console.log('\nUser ' + socket.username + ' is ready');
       gb.userReady(userid) && socket.broadcast.emit('members', gb.members);
 
       let usersCountValid = gb.members.length > 1;
@@ -83,7 +83,7 @@ socketio.getServer = (server) => {
         gb.members.forEach( m =>{ m.ready = false;  m.bingo = false; m.restOfTurn=gb.turnsInit; })
 
 
-        // ready for start
+        // ready countDown for start
         gb.countDown = gb.countDownInit;
         gb.countDowner(()=>{
           // game begins:
@@ -101,8 +101,8 @@ socketio.getServer = (server) => {
           let turnCount = 1;
           let nextDrawer;   // leave undefined
 
-          // gb.gameID = gb.setTimeoutLinkIme(()=>{
-          gb.setTimeoutLinkIme(()=>{
+          gb.gameID = gb.setInterval(()=>{
+          // gb.setTimeoutLinkIme(()=>{
 
             nextDrawer = gb.nextDrawer(); // give the next drawer
 
@@ -110,20 +110,29 @@ socketio.getServer = (server) => {
             /* when the turn begins checked game if ends */
 
             /* bad solution: doule checked, for js problem */
-            gb.countScore(); // checked results (not only guessing ends
-            io.emit('members', gb.members)
+            // gb.countScore(); // checked results (not only guessing ends
+            // io.emit('members', gb.members)
 
             if(nextDrawer === null) {
               // game over
               gb.gameState = 0;
               gb.countDown = gb.countDownInit;
               gb.members.forEach((m)=>{m.ready=false; m.bingo=false})
-              // clearInterval(gb.gameID);
-              // clearTimeout(gb.gameID);
               io.emit('game status',  { status: 0 } );
               io.emit('members', gb.members)
+              clearInterval(gb.gameID);
+              // clearTimeout(gb.gameID);
               return;
             }
+
+            /********** countDowner( draw&guess time ) **********/
+            gb.countDown = gb.countDownDrawing;
+            gb.countDowner(()=>{
+              gb.DEBUG_MODE && console.log('\n<Turn', turnCount, 'ends> Time up, guessing Result: \n');
+              gb.countScore(); // checked results when guessing ends
+              io.emit('members', gb.members)
+              ++turnCount;
+            });
 
             nextDrawer.restOfTurn --; // reduce his restOfTurn
 
@@ -144,23 +153,16 @@ socketio.getServer = (server) => {
               gb.DEBUG_MODE && console.log(
                 'name: ', m.name,
                 'score: ', m.score,
-                'status: ', nextDrawer.id === m.id ? 'drawing' : 'guessing',
-                'restOfTurn', m.restOfTurn
+                'status: ', nextDrawer.id === m.id ? 'drawing ' : 'guessing',
+                'restOfTurn: ', m.restOfTurn
               )
             }
 
-            /********** countDowner( draw&guess time ) **********/
-            gb.countDown = gb.countDownDrawing;
-            gb.countDowner(()=>{
-              gb.DEBUG_MODE && console.log('\n<Turn', turnCount, 'ends> Time up, guessing Result: \n');
-              gb.countScore(); // checked results when guessing ends
-              io.emit('members', gb.members)
-              ++turnCount;
-            });
 
-          }, gb.countDownTurn * 1000, ()=>{
-            return nextDrawer === null
-          } ); // setTimeoutLinkIme end
+
+          }, gb.countDownTurn * 1000
+            //, ()=>{return nextDrawer === null}
+          ); // setTimeoutLinkIme end
         });
       } // endif
     });
