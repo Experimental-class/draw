@@ -51,7 +51,7 @@ html,body{
     width: 1400px;
     height: 960px;
     position: absolute;
-    background: rgba(0,0,0,.7);
+    background: none;
     display: none;
     margin-top: -20px;
 }

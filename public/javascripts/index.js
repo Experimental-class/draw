@@ -3,130 +3,11 @@
 var socket = io();
 var gameStatus = 0;
 var draw = false;
+var score;
 
 function $(id) {
     return document.getElementById(id);
 }
-
-
-//  登录
-var userName = $('user-name');
-var loginContainer = $('login-container');
-var loginButton = $('login-button');
-var readyButton = $('ready-button');
-function toLogin() {
-    loginContainer.style.display = 'block';
-}
-userName.onkeydown = function (e) {
-    if (e.key == 'Enter'){
-        socket.emit('add user',userName.value);  //  用户名
-        loginContainer.style.display = 'none';
-        loginButton.style.display = 'none';
-        readyButton.style.display = 'block';
-        socket.username = userName.value;
-    }
-};
-
-
-//  准备
-function ready() {
-    socket.emit('user ready',socket.id);  //  用户名
-
-    var userMessage = $('user-message');
-    userMessage.innerHTML += '<b style="color: green;float: right;margin-right: 55px;margin-top: -20px;">√</b></li>';
-    readyButton.disabled = 'disabled';
-}
-
-
-//  房间人数
-socket.on('user count', function(count) {
-    var userNum = $('user-count');
-    userNum.textContent = '当前房间总人数： ' + count;
-});
-
-//  用户基本信息
-socket.on('members',function (data) {
-    console.log(data);
-
-    var userMessage = $('user-message');
-    userMessage.innerHTML = '';
-
-    for (var i = 0; i < data.length; i++){
-        if (data[i].ready === true){
-            userMessage.innerHTML += '<li style="margin-top: 5px;"><a style="color: red">用户：</a>'+data[i].name+'<b style="color: green;float: right;margin-right: 55px;">√</b></li>';
-        } else {
-            userMessage.innerHTML += '<li style="margin-top: 5px;"><a style="color: red">用户：</a>'+data[i].name+'</li>';
-        }
-    }
-
-    // if (data.length >= 2){
-    //     for (var j = 1; j < data.length; j++){
-    //         if (data[0].ready === true && data[j].ready === data[j-1].ready){
-    //             var startContainer = $('start-container');
-    //             var startTime = $('count-time');
-    //
-    //             startContainer.style.display = 'block';
-    //
-    //             var s=5;
-    //             var intetvalFirst = setInterval(function () {
-    //                 startTime.textContent = s--;
-    //                 if (s <= 0){
-    //                     clearInterval(intetvalFirst);
-    //                     startContainer.style.display = 'none';
-    //                 }
-    //             },1000)
-    //         }
-    //     }
-    // }
-});
-
-//  游戏状态
-var countTime = $("time");
-socket.on('game status',function (data) {
-    var word = $('word');
-    var nowWord = $('nowWord');
-
-    console.log(data);
-
-    // var startTime = $('count-time');
-    // var startContainer = $('start-container');
-    // startContainer.style.display = 'block';
-    // startTime.innerHTML = "ready go !";
-    // var s=1;
-    // var intetvalFirst = setInterval(function () {
-    //     s--
-    //     if (s <= 0){
-    //         clearInterval(intetvalFirst);
-    //         startContainer.style.display = 'none';
-    //     }
-    // },1000);
-
-    if (data.status === 1){
-        gameStatus = 1;
-            if (data.nextDrawer.id === socket.id){
-                nowWord.innerHTML = "提示：";
-                word.innerHTML = data.tip;
-            } else {
-                nowWord.innerHTML = "当前词汇：";
-                word.innerHTML = data.word;
-                draw = true;
-            }
-    } else {
-        word.innerHTML = '';
-        countTime.textContent = '';
-    }
-});
-
-//  游戏计时
-socket.on('time', function (data){
-    if (gameStatus === 1){
-        countTime.innerHTML = (data.countDown > 0 ? data.countDown : '0.00');
-    } else {
-        countTime.textContent = '';
-    }
-});
-
-
 
 //  画布
 var container = $('canvas-container');
@@ -240,6 +121,120 @@ function drawLine(line) {
 }
 
 
+
+//  登录
+var userName = $('user-name');
+var loginContainer = $('login-container');
+var loginButton = $('login-button');
+var readyButton = $('ready-button');
+function toLogin() {
+    loginContainer.style.display = 'block';
+}
+userName.onkeydown = function (e) {
+    if (e.key == 'Enter'){
+        socket.username = userName.value;
+        socket.emit('add user',userName.value);  //  用户名
+
+        loginContainer.style.display = 'none';
+        loginButton.style.display = 'none';
+        readyButton.style.display = 'block';
+    }
+};
+
+//  准备
+function ready() {
+    socket.emit('user ready',socket.id);  //  用户名
+
+    $('user-message').innerHTML += '<b style="color: green;float: right;margin-right: 55px;margin-top: -20px;">√</b>';
+
+    readyButton.disabled = 'disabled';
+    readyButton.textContent = "准备好了";
+}
+
+
+//  房间人数
+socket.on('user count', function(count) {
+    var userNum = $('user-count');
+    userNum.textContent = '当前房间总人数： ' + count;
+});
+
+
+//  用户基本信息
+socket.on('members',function (data) {
+    var userMessage = $('user-message');
+    userMessage.innerHTML = '';
+
+    console.log(data);
+
+    $("score").innerHTML = "总积分：";
+
+    for (var i = 0; i < data.length; i++){
+        if (data[i].ready === true){
+            userMessage.innerHTML += '<li style="margin-top: 5px;"><a style="color: red">用户：</a>'+data[i].name+'<b style="color: green;float: right;margin-right: 55px;">√</b></li>';
+        } else {
+            userMessage.innerHTML += '<li style="margin-top: 5px;"><a style="color: red">用户：</a>'+data[i].name+'</li>';
+        }
+
+        if (socket.id === data[i].id){
+            $("score").innerHTML = "总积分：" + data[i].score;
+        }
+        //
+        // if (data[i].restOfTurn === 0 && data[i+1].restOfTurn === 0){
+        //     $('word').innerHTML = "";
+        //     $('nowWord').innerHTML = "";
+        //     $("time").innerHTML = "";
+        //     $("start-container").style.display = "block";
+        //     $("count-time").innerHTML = "第一回合结束，请重新准备开始";
+        // }
+    }
+});
+
+//  游戏状态
+var countTime = $("time");
+socket.on('game status',function (data) {
+    var word = $('word');
+    var nowWord = $('nowWord');
+
+    if (data.status === 1){
+        gameStatus = 1;
+        if (data.nextDrawer.id === socket.id){
+            nowWord.innerHTML = "提示：";
+            word.innerHTML = data.tip;
+        } else {
+            nowWord.innerHTML = "当前词汇：";
+            word.innerHTML = data.word;
+            draw = true;
+        }
+    } else {
+        word.innerHTML = '';
+        countTime.textContent = '';
+    }
+});
+
+//  游戏计时
+socket.on('time', function (data){
+    if (gameStatus === 1){
+        countTime.innerHTML = (data.countDown > 0 ? data.countDown : '0.00');
+
+        if (!(data.countDown > 0)){
+
+            context.height = container.clientHeight;
+            context.width = container.clientWidth;
+
+            setTimeout(function () {
+                $("start-container").style.display = "block";
+                $("count-time").innerHTML = "下一轮，准备";
+            },2000);
+
+        } else {
+            $("start-container").style.display = "none";
+        }
+    } else {
+        countTime.textContent = '';
+    }
+});
+
+
 //  回答兼聊天
 var postChatData = $('postChat');
 var chatData = $('chat');
@@ -249,6 +244,15 @@ postChatData.onclick = function () {
         username: socket.username || 'unknown user',
         word: chatData.value,
     });
+
+    socket.emit('guess word', chatData.value);
+
+    if (socket.username){
+        tipsContainer.innerHTML += "<li><b style='color: red'>"+socket.username + "：</b>" + chatData.value+"</li>";
+    } else {
+        tipsContainer.innerHTML += "<li><b style='color: red'>unknown user：</b>" + chatData.value+"</li>";
+    }
+
     chatData.value = '';
 };
 chatData.onkeydown = function (e) {
@@ -257,10 +261,18 @@ chatData.onkeydown = function (e) {
             username: socket.username || 'unknown user',
             word: chatData.value,
         });
+
+        socket.emit('guess word', chatData.value);
+
+        if (socket.username){
+            tipsContainer.innerHTML += "<li><b style='color: red'>"+socket.username + "：</b>" + chatData.value+"</li>";
+        } else {
+            tipsContainer.innerHTML += "<li><b style='color: red'>unknown user：</b>" + chatData.value+"</li>";
+        }
+
         chatData.value = '';
     }
 };
 socket.on('chat',function (data) {
-    console.log(data);
     tipsContainer.innerHTML += "<li><b style='color: red'>"+data.username + "：</b>" + data.word+"</li>";
 });
