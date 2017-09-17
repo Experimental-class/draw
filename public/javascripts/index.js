@@ -176,12 +176,12 @@ socket.on('game status',function (data) {
     if (data.status === 1){
         gameStatus = 1;
         if (data.nextDrawer.id === socket.id){
-            $('nowWord').innerHTML = "猜词 提示：";
-            $('word').innerHTML = data.tip;
+          $('nowWord').innerHTML = "画图 当前词汇：";
+          $('word').innerHTML = data.word;
+          draw = true;
         } else {
-            $('nowWord').innerHTML = "画图 当前词汇：";
-            $('word').innerHTML = data.word;
-            draw = true;
+          $('nowWord').innerHTML = "猜词 提示：";
+          $('word').innerHTML = data.tip + ' 画图人：'+ data.nextDrawer.name;
         }
     } else {
         gameStatus = 0;
