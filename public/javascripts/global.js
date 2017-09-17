@@ -1,5 +1,5 @@
 let Global =  {
-    DEBUG_MODE : 0,            // 1 for dev mode , 0 for GUI mode
+    DEBUG_MODE : 1,            // 1 for dev mode , 0 for GUI mode
     members : [],
     word : {},                 // current guessing wordObj
     countDownInit: 3,          // for ready

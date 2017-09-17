@@ -5,11 +5,11 @@ const path = require('path');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  if (gb.DEBUG_MODE) {
-    res.render('index', { title: 'Express' });
-  } else {
-    res.sendFile(path.join(__dirname, '../public', 'game.html'));
-  }
+  res.sendFile(path.join(__dirname, '../public', 'game.html'));
+});
+
+router.get('/debug/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
 });
 
 // note: method abanded
