@@ -139,7 +139,7 @@ $('user-name').onkeydown = function (e) {
 function ready() {
     socket.emit('user ready',socket.id);  //  用户名
 
-    $('user-message').innerHTML += '<b style="color: green;float: right;margin-right: 55px;margin-top: -20px;">√</b>';
+    // $('user-message').innerHTML += '<b style="color: green;float: right;margin-right: 55px;margin-top: -20px;">√</b>';
     $('ready-button').disabled = 'disabled';
     $('ready-button').textContent = "准备好了";
 }
@@ -159,14 +159,14 @@ socket.on('members',function (data) {
     $("score").innerHTML = "总积分：";
 
     for (var i = 0; i < data.length; i++){
-        if (data[i].ready){
-            $('user-message').innerHTML += '<li style="margin-top: 5px;"><a style="color: red">用户：</a>'+data[i].name+'<b style="color: green;float: right;margin-right: 55px;">√</b></li>';
+        if (data[i].id === socket.id){
+            $("score").innerHTML = "<b style='color: red;'>"+ data[i].name + "</b>&nbsp;&nbsp;的总积分：" + data[i].score + "&nbsp;&nbsp;我的剩余画图回合：" + data[i].restOfTurn;
         } else {
-            $('user-message').innerHTML += '<li style="margin-top: 5px;"><a style="color: red">用户：</a>'+data[i].name+'</li>';
-        }
-
-        if (socket.id === data[i].id){
-            $("score").innerHTML = "<b style='color: red;'>"+ data[i].name + "</b>&nbsp;&nbsp;的总积分：" + data[i].score + "&nbsp;&nbsp;剩余回合：" + data[i].restOfTurn;
+            // if (data[i].ready){
+                // $('user-message').innerHTML += '<li style="margin-top: 5px;"><a style="color: red">用户：</a>'+data[i].name+'<b style="color: green;float: right;margin-right: 55px;">√</b></li>';
+            // } else {
+                $('user-message').innerHTML += '<li style="margin-top: 5px;"><a style="color: red">用户：</a>'+data[i].name+'<br>总积分：' + data[i].score + "&nbsp;&nbsp;剩余回合：" + data[i].restOfTurn+'</li>';
+            // }
         }
     }
 });
@@ -244,5 +244,9 @@ $('chat').onkeydown = function (e) {
     }
 };
 socket.on('chat',function (data) {
-    $('tips').innerHTML += "<li><b style='color: red'>"+data.username + "：</b>" + data.word+"</li>";
+    if (data.username === socket.username){
+        $('tips').innerHTML += "<li><b style='color: red'>"+data.username + "：</b>" + data.word+"</li>";
+    } else {
+        $('tips').innerHTML += "<li><b style='color: green'>"+data.username + "：</b>" + data.word+"</li>";
+    }
 });
