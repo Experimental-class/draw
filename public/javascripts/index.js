@@ -125,7 +125,8 @@ function toLogin() {
     $('login-container').style.display = 'block';
 }
 $('user-name').onkeydown = function (e) {
-    if (e.key == 'Enter'){
+    // if (e.key == 'Enter'){
+      if (e.keyCode == 13){
         socket.username = $('user-name').value;
         socket.emit('add user',$('user-name').value);  //  用户名
 
@@ -213,7 +214,7 @@ var cooldown = 0;
 
 $('postChat').onclick = chat;
 $('chat').onkeydown = function (e) {
-    if (e.key == 'Enter'){
+    if (e.keyCode == 13){
         chat();
     }
 };
