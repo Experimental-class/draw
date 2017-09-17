@@ -176,10 +176,10 @@ socket.on('game status',function (data) {
     if (data.status === 1){
         gameStatus = 1;
         if (data.nextDrawer.id === socket.id){
-            $('nowWord').innerHTML = "提示：";
+            $('nowWord').innerHTML = "猜词 提示：";
             $('word').innerHTML = data.tip;
         } else {
-            $('nowWord').innerHTML = "当前词汇：";
+            $('nowWord').innerHTML = "画图 当前词汇：";
             $('word').innerHTML = data.word;
             draw = true;
         }
@@ -196,7 +196,7 @@ socket.on('game status',function (data) {
 socket.on('time', function (data){
 
     if (gameStatus === 1){
-        $("time").innerHTML = (data.countDown > 0 ? data.countDown : '0.00');
+        $("time").innerHTML = (data.countDown > 0 ? data.countDown : 0);
 
         if (!(data.countDown > 0)){
             context.height = container.clientHeight;
