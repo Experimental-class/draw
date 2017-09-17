@@ -166,7 +166,7 @@ socket.on('members',function (data) {
         }
 
         if (socket.id === data[i].id){
-            $("score").innerHTML = "总积分：" + data[i].score;
+            $("score").innerHTML = "<b style='color: red;'>"+ data[i].name + "</b>&nbsp;&nbsp;的总积分：" + data[i].score + "&nbsp;&nbsp;剩余回合：" + data[i].restOfTurn;
         }
     }
 });
@@ -194,6 +194,7 @@ socket.on('game status',function (data) {
 
 //  游戏计时
 socket.on('time', function (data){
+
     if (gameStatus === 1){
         $("time").innerHTML = (data.countDown > 0 ? data.countDown : '0.00');
 
