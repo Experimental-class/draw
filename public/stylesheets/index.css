@@ -3,7 +3,7 @@
     padding: 0;
 }
 html,body{
-    overflow: hidden;
+    /*overflow: hidden;*/
     background: #c3b3a3;
     color: #897561;
 }
