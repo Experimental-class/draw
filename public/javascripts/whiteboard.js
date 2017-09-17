@@ -72,11 +72,11 @@ const guess = () => {
 // ---- key event ---
 
 $('nameInput').onkeydown = e => {
-  e.key == 'Enter' && login();
+  e.keyCode == 13 && login();
 };
 
 $('guessInput').onkeydown = e => {
-  e.key == 'Enter' && guess();
+  e.keyCode == 13 && guess();
 }
 
 
