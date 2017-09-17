@@ -209,40 +209,47 @@ socket.on('time', function (data){
 
 
 //  回答兼聊天
-$('postChat').onclick = function () {
-    socket.emit('chat', {
-        username: socket.username || 'unknown user',
-        word: $('chat').value,
-    });
+var cooldown = 0;
 
-    socket.emit('guess word', $('chat').value);
-
-    if (socket.username){
-        $('tips').innerHTML += "<li><b style='color: red'>"+socket.username + "：</b>" + $('chat').value+"</li>";
-    } else {
-        $('tips').innerHTML += "<li><b style='color: red'>unknown user：</b>" + $('chat').value+"</li>";
-    }
-
-    $('chat').value = '';
-};
+$('postChat').onclick = chat;
 $('chat').onkeydown = function (e) {
     if (e.key == 'Enter'){
-        socket.emit('chat',{
-            username: socket.username || 'unknown user',
-            word: $('chat').value,
-        });
-
-        socket.emit('guess word', $('chat').value);
-
-        if (socket.username){
-            $('tips').innerHTML += "<li><b style='color: red'>"+socket.username + "：</b>" + $('chat').value+"</li>";
-        } else {
-            $('tips').innerHTML += "<li><b style='color: red'>unknown user：</b>" + $('chat').value+"</li>";
-        }
-
-        $('chat').value = '';
+        chat();
     }
 };
+
+function chat() {
+  if (cooldown > 0 || $('chat').value === '') return;
+  socket.emit('chat', {
+      username: socket.username || 'unknown',
+      word: $('chat').value,
+  });
+
+  socket.emit('guess word', $('chat').value);
+
+  if (socket.username){
+      $('tips').innerHTML += "<li><b style='color: red'>"+socket.username + "：</b>" + $('chat').value+"</li>";
+  } else {
+      $('tips').innerHTML += "<li><b style='color: red'>unknown</b>" + $('chat').value+"</li>";
+  }
+
+  $('chat').value = '';
+
+  cooldown = 2;
+  $('postChat').disabled = 'disabled';
+  $('postChat').value = cooldown;
+  let cooldowner = setInterval(()=>{
+    $('postChat').value = --cooldown;
+    if (cooldown <= 0){
+      clearInterval(cooldowner);
+      $('postChat').disabled = '';
+      $('postChat').value = '发送';
+    }
+  }, 1e3); // 1s for interval
+}
+
+
+
 socket.on('chat',function (data) {
-    $('tips').innerHTML += "<li><b style='color: red'>"+data.username + "：</b>" + data.word+"</li>";
+    $('tips').innerHTML += "<li><b>"+data.username + "：</b>" + data.word+"</li>";
 });
