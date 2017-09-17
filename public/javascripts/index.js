@@ -220,6 +220,7 @@ $('chat').onkeydown = function (e) {
 
 function chat() {
   if (cooldown > 0 || $('chat').value === '') return;
+  limitBox()
   socket.emit('chat', {
       username: socket.username || 'unknown',
       word: $('chat').value,
@@ -251,5 +252,12 @@ function chat() {
 
 
 socket.on('chat',function (data) {
+    limitBox()
     $('tips').innerHTML += "<li><b>"+data.username + "：</b>" + data.word+"</li>";
 });
+
+function limitBox() {
+  if ($('tips').childElementCount>15) {
+    $('tips').firstChild.remove()
+  }
+}
